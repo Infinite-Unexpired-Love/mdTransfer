@@ -1,4 +1,4 @@
-package mdRelated;
+package md;
 import java.io.IOException;
 import java.lang.*;
 import java.lang.reflect.Array;
@@ -7,15 +7,18 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class mdReader {
+public class Reader {
     private ArrayList<String> fileLines;
-    private String filePath;
-
-    public mdReader(String filePath){
-        if(filePath.matches(".*(\.md)$"))
+    private final String filePath;
+    private ArrayList<String> imgURLs;
+    public Reader(String filePath){
+        if(filePath.matches(".*(\\.md)$"))
             this.filePath=filePath;
         else
             this.filePath=null;
+    }
+    private String addslashes(String origin){
+        return origin.replaceAll("\\\\","\\\\");
     }
     private boolean readMd(){
         if(filePath==null){
@@ -25,8 +28,16 @@ public class mdReader {
         else{
             try{
                 Scanner in=new Scanner(Path.of(filePath), StandardCharsets.UTF_8);
-                while (in.hasNextLine())
+                while (in.hasNextLine()){
+                    String line=in.nextLine();
+
+                    if(line.matches("!\\[image-\\d*\\]\\(.*\\)")){
+                        int begin=line.indexOf('(');
+                        int end=line.indexOf(')');
+                        imgURLs.add(addslashes(line.substring(begin+1,end)));
+                    }
                     fileLines.add(in.nextLine());
+                }
                 return true;
             }
             catch (IOException e){
@@ -42,6 +53,8 @@ public class mdReader {
             return new ArrayList<>(fileLines);
         else
             return null;
-    },
-    public ArrayList<>
+    }
+    public ArrayList<byte[]> getImages(){
+
+    }
 }
